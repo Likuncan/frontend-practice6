@@ -17,12 +17,30 @@ const loadData = async () => {
     $('#sub-title').text(data.title + ' · 数据来源：课程统一数据集');
     $('#status').hide();
     renderCards(data);
-    // 第一步检查点：下面两个函数第二、三步才定义，先注释
-    // renderBarChart(data);
-    // renderLineChart(data);
+    renderBarChart(data);
+    // renderLineChart(data);  // 第三步再放开
   } catch (error) {
     $('#status').text('加载失败：' + error.message).show();
   }
+};
+
+let barChart = null;
+const renderBarChart = (data) => {
+  if (barChart === null) {
+    barChart = echarts.init(document.querySelector('#bar-chart'));
+  }
+  barChart.setOption({
+    title: { text: '各月各品类借阅量', left: 'center' },
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0 },
+    xAxis: { data: data.months },
+    yAxis: { name: '册' },
+    series: data.series.map(s => ({
+      name: s.category,
+      type: 'bar',
+      data: s.counts
+    }))
+  });
 };
 
 const renderCards = (data) => {
