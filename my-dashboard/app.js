@@ -17,11 +17,30 @@ const loadData = async () => {
     $('#sub-title').text(data.title + ' · 数据来源：' + data.source);
     $('#status').hide();
     renderCards(data);
-    // renderBarChart(data);   // 第二步再放开
+    renderBarChart(data);
     // renderLineChart(data);  // 第三步再放开
   } catch (error) {
     $('#status').text('加载失败：' + error.message).show();
   }
+};
+
+let barChart = null;
+const renderBarChart = (data) => {
+  if (barChart === null) {
+    barChart = echarts.init(document.querySelector('#bar-chart'));
+  }
+  barChart.setOption({
+    title: { text: data.title, left: 'center' },
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0 },
+    xAxis: { data: data.dates },
+    yAxis: { name: '气温（' + data.unit + '）' },
+    series: data.cities.map(c => ({
+      name: c.city,
+      type: 'bar',
+      data: c.temps
+    }))
+  });
 };
 
 const renderCards = (data) => {
