@@ -18,7 +18,7 @@ const loadData = async () => {
     $('#status').hide();
     renderCards(data);
     renderBarChart(data);
-    // renderLineChart(data);  // 第三步再放开
+    renderLineChart(data);
   } catch (error) {
     $('#status').text('加载失败：' + error.message).show();
   }
@@ -42,6 +42,36 @@ const renderBarChart = (data) => {
     }))
   });
 };
+
+let lineChart = null;
+const renderLineChart = (data) => {
+  if (lineChart !== null) {
+    lineChart.destroy();               // 防重复初始化
+  }
+  const ctx = document.querySelector('#line-chart');
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.dates,
+      datasets: data.cities.map(c => ({
+        label: c.city,
+        data: c.temps,
+        borderWidth: 1
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: '一周气温变化趋势（单位：' + data.unit + '）' }
+      }
+    }
+  });
+};
+
+window.addEventListener('resize', () => {
+  if (barChart) barChart.resize();  // Chart.js响应式默认自动处理，无需手动
+});
 
 const renderCards = (data) => {
   const unit = data.unit || '';
